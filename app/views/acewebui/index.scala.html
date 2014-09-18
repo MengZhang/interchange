@@ -50,9 +50,17 @@
               </div>
       </div>
       <div class="modal-footer">
+	@if(request.getQueryString("GALAXY_URL") && request.getQueryString("tool_id")) {
+	  <input type="hidden" name="GALAXY_URL" value="@request.getQueryString("GALAXY_URL")">
+	  <input type="hidden" name="tool_id"    value="@request.getQueryString("tool_id")">
+	}
         <button type="button" class="btn btn-danger bord0" data-dismiss="modal">Cancel</button>
-        <button id="download_data" type="button" class="btn btn-success bord0" data-dismiss="modal" disabled="">OK</button>
-        <button id="galaxy_data"   type="button" class="btn btn-success brod0" data-dismess="modal" disabled="">Send to Galaxy</button>
+        <button id="download_data" type="button" class="btn btn-success bord0" data-dismiss="modal" disabled="">@if(request.getQueryString("GALAXY_URL") && request.getQueryString("tool_id")) {
+	  Send to Galaxy
+	} else {
+	  OK
+	}
+        </button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

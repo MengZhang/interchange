@@ -416,14 +416,12 @@ function enable_disable_download_button() {
     $(".db_type_filter").each(function(index, value) {
         if ($(value).prop("checked")) {
             $("#download_data").prop("disabled", false);
-            $("#galaxy_data").prop("disabled", false);
             is_any_check_box_checked = true;
             return false;
         }
     });
     if (is_any_check_box_checked === false) {
         $("#download_data").prop("disabled", true);
-        $("#galaxy_data").prop("disabled", true);
     }
 }
 
@@ -435,7 +433,6 @@ $("#raise_up_download_modal").click(function() {
     $(".db_type_filter").each(function(index, value) {
         $(value).prop("checked", false);
         $("#download_data").prop("disabled", true);
-        $("#galaxy_data").prop("disabled", true);
     });
 });
 
@@ -459,12 +456,6 @@ function getParameterByName(name) {
 }
 
 function obtain_initial_map_population() {
-    // Check for the GALAXY_URL parameter
-    var galaxy_url = getParameterByName("GALAXY_URL");
-    if(galaxy_url != "") {
-      $("#galaxy_data").css('visibility', 'visible');
-      $("#download_data").css('visibility', 'hidden');
-    }
     $("#spinner").modal("show");
     options = {
         type: "GET",

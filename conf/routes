@@ -1,0 +1,13 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           interchange.controllers.Application.index
+GET	/cropsitedb		    interchange.controllers.AceWebUI.index
+GET	/cropsitedb/upload	    interchange.controllers.AceWebUI.uploadForm
+POST	/cropsitedb/upload	    interchange.controllers.AceWebUI.parseUpload
+GET	/cropsitedb/uploadFinal	    interchange.controllers.AceWebUI.finalizeUpload
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)

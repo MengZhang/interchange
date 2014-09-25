@@ -1,256 +1,252 @@
 @(crops: Seq[interchange.controllers.AceWebUI.CropCache])(implicit request: RequestHeader, session: Session)
 @scripts = {
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.2/leaflet.css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.Default.css" />
-  <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.2/leaflet.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/leaflet.markercluster.js"></script>
-  <script src="@routes.Assets.at("js/search.js")"></script>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.2/leaflet.css" />
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.css" />
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.Default.css" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.2/leaflet.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/leaflet.markercluster.js"></script>
+<script src="@routes.Assets.at("js/search.js")"></script>
 
 }
 
 @preamble = {
 <div class="topUploadSection col-sm-12">
-}
+  }
 
-@afterword = {
-<div class="modal fade" id="DownloadModal" tabindex="-2" role="dialog" aria-labelledby="download modal" aria-hidden="true" >
-  <div class="modal-dialog">
-    <div class="modal-content bord0">
-      <div class="modal-header modHead">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="DownloadModalTitle">Download Data</h4>
-      </div>
-      <div class="modal-body">
-        <h4> Please select from the following options, how you want your data formatted.</h4>
-           <p>(Please enter your email if not logged in.  Then select one of the following)</p>
-           <div class="input-group">
-  				<span class="input-group-addon">Email:</span>
- 				<input type="text" class="form-control" placeholder="it@@agmip.org">
-			</div>
-            <div class="form-group" style="font-size:18px;">
-                <div class="checkbox">
-                  <label>
-                    <input class="db_type_filter" type="checkbox" value="ACE"/>
-                    ACEDB
-                  </label>
-                </div>
-               <div class="checkbox">
-                  <label>
-                    <input class="db_type_filter" type="checkbox" value="DOME"/>
-                    DOME
-                  </label>
-                </div>
-               <div class="checkbox">
-                  <label>
-                    <input class="db_type_filter" type="checkbox" value="ACMO"/>
-                    ACMO
-                  </label>
-                </div>
-              </div>
-      </div>
-      <div class="modal-footer">
-	@if(request.getQueryString("GALAXY_URL") && request.getQueryString("tool_id")) {
-	  <input type="hidden" name="GALAXY_URL" value="@request.getQueryString("GALAXY_URL")">
-	  <input type="hidden" name="tool_id"    value="@request.getQueryString("tool_id")">
-	}
-        <button type="button" class="btn btn-danger bord0" data-dismiss="modal">Cancel</button>
-        <button id="download_data" type="button" class="btn btn-success bord0" data-dismiss="modal" disabled="">@if(request.getQueryString("GALAXY_URL") && request.getQueryString("tool_id")) {
-	  Send to Galaxy
-	} else {
-	  OK
-	}
-        </button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-<!-- ~~~~~~~~~~~~ Download modal ~~~~~~~~~~~~~~~ -->
-
-<!-- Alert Modal-->
-<div class="modal fade" id="alertModal" tabindex="-1" role="dialog" aria-labelledby="alert modal" aria-hidden="true" >
-  <div class="modal-dialog">
-    <div class="modal-content bord0">
-      <div class="modal-header modHead alertHead">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="error_message_title">Alert</h4>
-      </div>
-      <div class="modal-body">
-        <h4 id="error_message"></h4>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-success bord0" data-dismiss="modal" >OK</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div>
-<!-- Alert Modal -->
-
-<!-- Spinner Modal-->
-<div class="modal fade" id="spinner" tabindex="-1" role="dialog" aria-labelledby="spinner modal" aria-hidden="true" data-keyboard="false" data-backdrop="static">
-
-	
-      <div class="modal-body">
-		<img id="spinner_image" src="@routes.Assets.at("images/spinner.gif")" /> 
-      </div>
-
-
-</div>
-<!-- Spinner Modal-->
-}
-
-@base("AgMIP Data Interchange - Crop Site Database - Search", Html(""), scripts, Html(""), preamble, afterword) {
-       	<div class="disIn col-sm-12">
-        		<h1 class="searchPageTitle" style="padding-left:0px;"><a class="collapseBtn" data-toggle="collapse" data-target="#searchSection">
-
-  						</a> Search the AgMIP Crop Site Database</h1>
-        		<div class="pull-right menuDivider">
-        		<div class="pull-right ShowDataTxt searchPos">
-  				<ul class="nav navbar-nav navbar-left padLeft agmipSearch">
-  					<li><div style="padding-top:15px;padding-right:10px; font-size:16px;"> Select Crop:</div></li>
-            		<li class="menuDivider">
-              			<div class="form-group" style="margin-top:8px; height:35px; width:200px;">
-                            <select id="crop_filter" class="searchBox form-control" >
-                                <option value="none">None</option>
-                                @for(crop <- crops) {
-			          <option value="@crop.crid">@crop.name</option>
-			        }
-    			    </select>
-            		</li>
-            		<li class="menuDivider">
-              			<a id="apply_filter" class="searchBtn"><span class=" glyphicon glyphicon-search greenSearchText"></span></a>
-            		</li>
-            		 <li class="menuDivider">
-                      			<a id="obtain_data" class="greenBtn">
-                                    <span class="greenBtnText">View Metadata</span>
-                                </a>
-                    </li>
-            		<li class="menuDivider">
-              			<a href="" class="helpBtnBg"><div class="helpBtn" style="text-align:center;">?</div></a>
-            		</li>
-          		</ul>
-  					</div>
-        		</div>
-        	</div>
-        	<div id="searchSection" class="collapse in">
-        	<div class="col-sm-12">
-        		<!-- Map goes here -->
-        		<div id="map" style="height:420px"></div>
-        	</div>
-        	</div>
+  @afterword = {
+  <div class="modal fade" id="DownloadModal" tabindex="-2" role="dialog" aria-labelledby="download modal" aria-hidden="true" >
+    <div class="modal-dialog">
+      <div class="modal-content bord0">
+        <div class="modal-header modHead">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="DownloadModalTitle">Download Data</h4>
         </div>
-      </div>    
-
-      <div class="col-sm-12 bottomContentSection">
-      		<div class="container">
-        		<div class="col-sm-12">
-        			<h4 class="pull-left greyTxt"> 
-              	  		<a class="collapseBtn collapsed" data-toggle="collapse" data-target="#current_data_container">
-  						</a> 
-  						Search Results:
-				<span id="current_data_number" class="badge" style="display:none" ></span>
-  					</h4>
-  					<div class="pull-right ShowResTxt rghtNeg5">
-					  <ul class="nav navbar-nav navbar-left padLeft">
-            		<li class="menuDivider">
-                    <a id="clear_current_data" class="blueBtn" style="display:none"> 
-                            <span class="blueBtnText">Clear</span>
-                        </a>
-            		</li>
-          		</ul>
-  					</div>
-        		</div>
-        	<div id="current_data_container" class="collapse">
-          		<div class="col-sm-12 table-responsive">
-                    <!-- ~~~~~~~~~~~~ this is the current data table ~~~~~~~~~~~~~~~ -->
-                    <div id="current_data" style="display:none" >
-						<div class="agmipTable">
-							<table class="table table-striped table-hover noWrap" >
-								<thead>
-									<tr> 
-										<th class="headerTbl ">
-											<input id="select_all_current_data" type="checkbox">
-										</th>
-										<th class="headerTbl ">Crop</th> 
-										<th class="headerTbl ">EXNAME</th> 
-										<th class="headerTbl ">Country</th> 
-										<th class="headerTbl ">State/Province</th> 
-										<th class="headerTbl ">Institution</th> 
-										<th class="headerTbl ">Cultivar</th> 
-										<th class="headerTbl ">Planting Date</th> 
-										<th class="headerTbl ">AgMIP Rating</th>
-									</tr>
-								</thead>
-
-                <tbody id="current_data_body"> 
-								</tbody>
-							</table>
-                        </div>
-                    </div>                    
-                    <!-- ~~~~~~~~~~~~ this is the current data table ~~~~~~~~~~~~~~~ -->
-          		<div class="pull-right ShowDataTxt rghtNeg5" >
-          		</div>
-          		</div>
-          		
+        <div class="modal-body">
+          <h4> Please select from the following options, how you want your data formatted.</h4>
+          <p>(Please enter your email if not logged in.  Then select one of the following)</p>
+          <div class="input-group">
+            <span class="input-group-addon">Email:</span>
+            <input type="text" class="form-control" placeholder="it@@agmip.org">
+          </div>
+          <div class="form-group" style="font-size:18px;">
+            <div class="checkbox">
+              <label>
+                <input class="db_type_filter" type="checkbox" value="ACE"/>
+                ACEDB
+              </label>
             </div>
+            <div class="checkbox">
+              <label>
+                <input class="db_type_filter" type="checkbox" value="DOME"/>
+                DOME
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input class="db_type_filter" type="checkbox" value="ACMO"/>
+                ACMO
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          @if(request.getQueryString("GALAXY_URL") && request.getQueryString("tool_id")) {
+          <input type="hidden" name="GALAXY_URL" value="@request.getQueryString("GALAXY_URL")">
+          <input type="hidden" name="tool_id"    value="@request.getQueryString("tool_id")">
+          }
+          <button type="button" class="btn btn-danger bord0" data-dismiss="modal">Cancel</button>
+          <button id="download_data" type="button" class="btn btn-success bord0" data-dismiss="modal" disabled="">@if(request.getQueryString("GALAXY_URL") && request.getQueryString("tool_id")) {
+            Send to Galaxy
+            } else {
+            OK
+            }
+          </button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  <!-- ~~~~~~~~~~~~ Download modal ~~~~~~~~~~~~~~~ -->
 
-        	</div>
+  <!-- Alert Modal-->
+  <div class="modal fade" id="alertModal" tabindex="-1" role="dialog" aria-labelledby="alert modal" aria-hidden="true" >
+    <div class="modal-dialog">
+      <div class="modal-content bord0">
+        <div class="modal-header modHead alertHead">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="error_message_title">Alert</h4>
+        </div>
+        <div class="modal-body">
+          <h4 id="error_message"></h4>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success bord0" data-dismiss="modal" >OK</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div>
+  <!-- Alert Modal -->
+
+  <!-- Spinner Modal-->
+  <div class="modal fade" id="spinner" tabindex="-1" role="dialog" aria-labelledby="spinner modal" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-body">
+      <img id="spinner_image" src="@routes.Assets.at("images/spinner.gif")" />
+    </div>
+  </div>
+  <!-- Spinner Modal-->
+  }
+
+  @base("AgMIP Data Interchange - Crop Site Database - Search", Html(""), scripts, Html(""), preamble, afterword) {
+  <div class="disIn col-sm-12">
+    <h1 class="searchPageTitle" style="padding-left:0px;"><a class="collapseBtn" data-toggle="collapse" data-target="#searchSection">
+
+    </a> Search the AgMIP Crop Site Database</h1>
+    <div class="pull-right menuDivider">
+      <div class="pull-right ShowDataTxt searchPos">
+        <ul class="nav navbar-nav navbar-left padLeft agmipSearch">
+          <li><div style="padding-top:15px;padding-right:10px; font-size:16px;"> Select Crop:</div></li>
+          <li class="menuDivider">
+          <div class="form-group" style="margin-top:8px; height:35px; width:200px;">
+            <select id="crop_filter" class="searchBox form-control" >
+              <option value="none">None</option>
+              @for(crop <- crops) {
+              <option value="@crop.crid">@crop.name</option>
+              }
+            </select>
+            </li>
+            <li class="menuDivider">
+            <a id="apply_filter" class="searchBtn"><span class=" glyphicon glyphicon-search greenSearchText"></span></a>
+            </li>
+            <li class="menuDivider">
+            <a id="obtain_data" class="greenBtn">
+              <span class="greenBtnText">View Metadata</span>
+            </a>
+            </li>
+            <li class="menuDivider">
+            <a href="" class="helpBtnBg"><div class="helpBtn" style="text-align:center;">?</div></a>
+            </li>
+          </ul>
+        </div>
       </div>
-            <div class="col-sm-12 midUploadSection">
-      		<div class="container">
-        		<div class="col-sm-12">
-        			<h4 class="pull-left greyTxt"> 
-              	  		<a class="collapseBtn collapsed" data-toggle="collapse" data-target="#saved_data_container">
-  						</a> 
-  						Selected Data:  
-                        <span id="saved_data_number" class="badge" style="display:none" ></span>
-  					</h4>
+    </div>
+    <div id="searchSection" class="collapse in">
+      <div class="col-sm-12">
+        <!-- Map goes here -->
+        <div id="map" style="height:420px"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
-                    <!-- ~~~~~~~~~~~~ download button ~~~~~~~~~~~~~~~ -->
-  					<div class="pull-right ShowDataTxt rghtNeg5" >
-  				        <ul class="nav navbar-nav navbar-left padLeft">
-                    		<li class="menuDivider">
-                      			<a id="raise_up_download_modal" class="greenBtn saved_data_button" 
-                                style="display:none" data-toggle="modal" data-target="#DownloadModal">
-                                    <span class="greenBtnText">Download Data</span>
-                                </a>
-                    		</li>
-                  		</ul>
-  					</div>
-                    <!-- ~~~~~~~~~~~~ download button ~~~~~~~~~~~~~~~ -->
+<div class="col-sm-12 bottomContentSection">
+  <div class="container">
+    <div class="col-sm-12">
+      <h4 class="pull-left greyTxt">
+        <a class="collapseBtn collapsed" data-toggle="collapse" data-target="#current_data_container">
+        </a>
+        Search Results:
+        <span id="current_data_number" class="badge" style="display:none" ></span>
+      </h4>
+      <div class="pull-right ShowResTxt rghtNeg5">
+        <ul class="nav navbar-nav navbar-left padLeft">
+          <li class="menuDivider">
+          <a id="clear_current_data" class="blueBtn" style="display:none">
+            <span class="blueBtnText">Clear</span>
+          </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div id="current_data_container" class="collapse">
+      <div class="col-sm-12 table-responsive">
+        <!-- ~~~~~~~~~~~~ this is the current data table ~~~~~~~~~~~~~~~ -->
+        <div id="current_data" style="display:none" >
+          <div class="agmipTable">
+            <table class="table table-striped table-hover noWrap" >
+              <thead>
+                <tr>
+                  <th class="headerTbl ">
+                    <input id="select_all_current_data" type="checkbox">
+                  </th>
+                  <th class="headerTbl ">Crop</th>
+                  <th class="headerTbl ">EXNAME</th>
+                  <th class="headerTbl ">Country</th>
+                  <th class="headerTbl ">State/Province</th>
+                  <th class="headerTbl ">Institution</th>
+                  <th class="headerTbl ">Cultivar</th>
+                  <th class="headerTbl ">Planting Date</th>
+                  <th class="headerTbl ">AgMIP Rating</th>
+                </tr>
+              </thead>
+
+              <tbody id="current_data_body">
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- ~~~~~~~~~~~~ this is the current data table ~~~~~~~~~~~~~~~ -->
+        <div class="pull-right ShowDataTxt rghtNeg5" >
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+<div class="col-sm-12 midUploadSection">
+  <div class="container">
+    <div class="col-sm-12">
+      <h4 class="pull-left greyTxt">
+        <a class="collapseBtn collapsed" data-toggle="collapse" data-target="#saved_data_container">
+        </a>
+        Selected Data:
+        <span id="saved_data_number" class="badge" style="display:none" ></span>
+      </h4>
+
+      <!-- ~~~~~~~~~~~~ download button ~~~~~~~~~~~~~~~ -->
+      <div class="pull-right ShowDataTxt rghtNeg5" >
+        <ul class="nav navbar-nav navbar-left padLeft">
+          <li class="menuDivider">
+          <a id="raise_up_download_modal" class="greenBtn saved_data_button"
+            style="display:none" data-toggle="modal" data-target="#DownloadModal">
+            <span class="greenBtnText">Download Data</span>
+          </a>
+          </li>
+        </ul>
+      </div>
+      <!-- ~~~~~~~~~~~~ download button ~~~~~~~~~~~~~~~ -->
 
 
-        		</div>
-        	<div id="saved_data_container" class="collapse ">
-          		<div class="col-sm-12 table-responsive">
-                    <!-- ~~~~~~~~~~~~ this is the saved data table ~~~~~~~~~~~~~~~ -->
-                    <div id="saved_data" style="display:none" >
-                      <div class="agmipTable">
-                        <table class="table table-striped table-hover noWrap" >
-							<thead>
-                                <th class="headerTbl ">
-									<span id="clear_saved_data" class='glyphicon glyphicon-remove'></span>
-								</th> 
-										<th class="headerTbl ">Crop</th> 
-										<th class="headerTbl ">EXNAME</th> 
-										<th class="headerTbl ">Country</th> 
-										<th class="headerTbl ">State/Province</th> 
-										<th class="headerTbl ">Institution</th> 
-										<th class="headerTbl ">Cultivar</th> 
-										<th class="headerTbl ">Planting Date</th> 
-										<th class="headerTdl ">AgMIP Rating</th>
+    </div>
+    <div id="saved_data_container" class="collapse ">
+      <div class="col-sm-12 table-responsive">
+        <!-- ~~~~~~~~~~~~ this is the saved data table ~~~~~~~~~~~~~~~ -->
+        <div id="saved_data" style="display:none" >
+          <div class="agmipTable">
+            <table class="table table-striped table-hover noWrap" >
+              <thead>
+                <th class="headerTbl ">
+                  <span id="clear_saved_data" class='glyphicon glyphicon-remove'></span>
+                </th>
+                <th class="headerTbl ">Crop</th>
+                <th class="headerTbl ">EXNAME</th>
+                <th class="headerTbl ">Country</th>
+                <th class="headerTbl ">State/Province</th>
+                <th class="headerTbl ">Institution</th>
+                <th class="headerTbl ">Cultivar</th>
+                <th class="headerTbl ">Planting Date</th>
+                <th class="headerTdl ">AgMIP Rating</th>
 
-							</thead>
-              <tbody id="saved_data_body"> 
-							</tbody>							
-                        </table>
-                        </div>
-                    </div>
+              </thead>
+              <tbody id="saved_data_body">
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-                    <!-- ~~~~~~~~~~~~ this is the saved data table ~~~~~~~~~~~~~~~ -->
+        <!-- ~~~~~~~~~~~~ this is the saved data table ~~~~~~~~~~~~~~~ -->
 
-          		</div>
-            </div>
+      </div>
+    </div>
 
-        	</div> 
-}
+  </div>
+  }

@@ -1,9 +1,100 @@
+//--------------------------------------------------------------
+// Code by Ayman Farhat
+// https://gist.github.com/aymanfarhat/5608517
+//--------------------------------------------------------------
+//--------------------------------------------------------------
+function urlObject(options) {
+    "use strict";
+    /*global window, document*/
+
+    var url_search_arr,
+        option_key,
+        i,
+        urlObj,
+        get_param,
+        key,
+        val,
+        url_query,
+        url_get_params = {},
+        a = document.createElement('a'),
+        default_options = {
+            'url': window.location.href,
+            'unescape': true,
+            'convert_num': true
+        };
+
+    if (typeof options !== "object") {
+        options = default_options;
+    } else {
+        for (option_key in default_options) {
+            if (default_options.hasOwnProperty(option_key)) {
+                if (options[option_key] === undefined) {
+                    options[option_key] = default_options[option_key];
+                }
+            }
+        }
+    }
+
+    a.href = options.url;
+    url_query = a.search.substring(1);
+    url_search_arr = url_query.split('&');
+
+    if (url_search_arr[0].length > 1) {
+        for (i = 0; i < url_search_arr.length; i += 1) {
+            get_param = url_search_arr[i].split("=");
+
+            if (options.unescape) {
+                key = decodeURI(get_param[0]);
+                val = decodeURI(get_param[1]);
+            } else {
+                key = get_param[0];
+                val = get_param[1];
+            }
+            key = key.toLowerCase();
+            if (options.convert_num) {
+                if (val.match(/^\d+$/)) {
+                    val = parseInt(val, 10);
+                } else if (val.match(/^\d+\.\d+$/)) {
+                    val = parseFloat(val);
+                }
+            }
+
+            if (url_get_params[key] === undefined) {
+                url_get_params[key] = val;
+            } else if (typeof url_get_params[key] === "string") {
+                url_get_params[key] = [url_get_params[key], val];
+            } else {
+                url_get_params[key].push(val);
+            }
+
+            get_param = [];
+        }
+    }
+
+    urlObj = {
+        protocol: a.protocol,
+        hostname: a.hostname,
+        host: a.host,
+        port: a.port,
+        hash: a.hash.substr(1),
+        pathname: a.pathname,
+        search: a.search,
+        parameters: url_get_params
+    };
+
+    return urlObj;
+}
+//--------------------------------------------------------------
+// Code by Mindtree
+// Modified by Christopher Villalobos
+//--------------------------------------------------------------
+
 //--------------------------------------------------------------table functionality
-current_data 	= [];
-saved_data		= [];
+current_data  = [];
+saved_data    = [];
 
 
-function make_default_when_undefined(variable, default_variable) 
+function make_default_when_undefined(variable, default_variable)
 {
     if (typeof variable === "undefined") {
         return default_variable;
@@ -11,271 +102,271 @@ function make_default_when_undefined(variable, default_variable)
     return variable;
 }
 
-function findIndex(eid, array) 
+function findIndex(eid, array)
 {
-	for (var i = 0; i < array.length; i++) {
-		if (eid === array[i]["eid"]) {
-			return i;
-		}
-	}
-	return -1;
+  for (var i = 0; i < array.length; i++) {
+    if (eid === array[i]["eid"]) {
+      return i;
+    }
+  }
+  return -1;
 }
 
 
 function showHideCurrentDataTable()
 {
-	if (current_data.length > 0) {
-		$("#current_data").show();
-		$("#clear_current_data").show();
-		$("#current_data_number").show();
-		$("#current_data_number").text(current_data.length+" search results");
-		var toggle_me_element = $("a[data-target='#current_data_container']");
-		if (toggle_me_element.hasClass("collapsed")) {
-			toggle_me_element.removeClass("collapsed");
-			$("#current_data_container").collapse("toggle");
-		}
-		$("html, body").animate({
-			scrollTop: $("#current_data_container").offset().top
-		}, 1500);
-	} else {
-		document.getElementById("select_all_current_data").checked = false;
-	}
+  if (current_data.length > 0) {
+    $("#current_data").show();
+    $("#clear_current_data").show();
+    $("#current_data_number").show();
+    $("#current_data_number").text(current_data.length+" search results");
+    var toggle_me_element = $("a[data-target='#current_data_container']");
+    if (toggle_me_element.hasClass("collapsed")) {
+      toggle_me_element.removeClass("collapsed");
+      $("#current_data_container").collapse("toggle");
+    }
+    $("html, body").animate({
+      scrollTop: $("#current_data_container").offset().top
+    }, 1500);
+  } else {
+    document.getElementById("select_all_current_data").checked = false;
+  }
 }
 
 
-function showHideSavedDataTable() 
+function showHideSavedDataTable()
 {
-	if (saved_data.length > 0) {
-		$("#saved_data").show();
-		$(".saved_data_button").show();
-		var toggle_me_element = $("a[data-target='#saved_data_container']");
-		if (toggle_me_element.hasClass("collapsed")) {
-			toggle_me_element.removeClass("collapsed");
-			$("#saved_data_container").collapse("toggle");
-		}
-		$("#saved_data_number").show();
-		$("#saved_data_number").text(saved_data.length+" selected");
-	} else {
-		$("#saved_data").hide();
-		$(".saved_data_button").hide();
-		$("#saved_data_number").hide();
-		document.getElementById("select_all_current_data").checked = false;
-	}
+  if (saved_data.length > 0) {
+    $("#saved_data").show();
+    $(".saved_data_button").show();
+    var toggle_me_element = $("a[data-target='#saved_data_container']");
+    if (toggle_me_element.hasClass("collapsed")) {
+      toggle_me_element.removeClass("collapsed");
+      $("#saved_data_container").collapse("toggle");
+    }
+    $("#saved_data_number").show();
+    $("#saved_data_number").text(saved_data.length+" selected");
+  } else {
+    $("#saved_data").hide();
+    $(".saved_data_button").hide();
+    $("#saved_data_number").hide();
+    document.getElementById("select_all_current_data").checked = false;
+  }
 }
 
 function generate_current_data_row(experiment, checked_attribute)
 {
 
-	row= ["<tr class='cdr' id='s_",experiment["eid"],"' ><td><input ",checked_attribute," type='checkbox' class='check' onclick='sclicked(event)'></td><td>",experiment["crid"],
-	"</td><td>", experiment["exname"] , "</td><td>", experiment["fl_loc_1"],    "</td><td>", experiment["fl_loc_2"], 
-	"</td><td>", experiment["institution"] , "</td><td>", experiment["cul_name"] , "</td><td>", experiment["pdate"] , 
-	"</td><td>", experiment["rat"], "</td>"].join('');
-	
-	return row;
+  row= ["<tr class='cdr' id='s_",experiment["eid"],"' ><td><input ",checked_attribute," type='checkbox' class='check' onclick='sclicked(event)'></td><td>",experiment["crid"],
+  "</td><td>", experiment["exname"] , "</td><td>", experiment["fl_loc_1"],    "</td><td>", experiment["fl_loc_2"],
+  "</td><td>", experiment["institution"] , "</td><td>", experiment["cul_name"] , "</td><td>", experiment["pdate"] ,
+  "</td><td>", experiment["rat"], "</td>"].join('');
+
+  return row;
 }
 
 function generate_saved_data_row(experiment)
 {
-	row= ["<tr id='r_",experiment["eid"],
-	"'><td><span class='glyphicon glyphicon-remove' onclick='rclicked(event)' ></span></td><td>",,experiment["crid"],
-	"</td><td>", experiment["exname"] , "</td><td>", experiment["fl_loc_1"],    "</td><td>", experiment["fl_loc_2"], 
-	"</td><td>", experiment["institution"] , "</td><td>", experiment["cul_name"] , "</td><td>", experiment["pdate"] , 
-	"</td><td>", experiment["rat"], "</td>"].join('');
-	
-	return row;
+  row= ["<tr id='r_",experiment["eid"],
+  "'><td><span class='glyphicon glyphicon-remove' onclick='rclicked(event)' ></span></td><td>",,experiment["crid"],
+  "</td><td>", experiment["exname"] , "</td><td>", experiment["fl_loc_1"],    "</td><td>", experiment["fl_loc_2"],
+  "</td><td>", experiment["institution"] , "</td><td>", experiment["cul_name"] , "</td><td>", experiment["pdate"] ,
+  "</td><td>", experiment["rat"], "</td>"].join('');
+
+  return row;
 }
 
 function build_current_data_table(data)
 {
-	content=[];
-	for(var i=0; i< current_data.length; i++)
-	{	
-		
-		if (findIndex(current_data[i]["eid"], saved_data) === -1) {
-			checked_attribute= "";
-		}else{
-			checked_attribute="checked=true";
-		}
-		
-		//cdr = current_data row
-		row = generate_current_data_row(current_data[i], checked_attribute);
-		
-		content[i+1] = row;
+  content=[];
+  for(var i=0; i< current_data.length; i++)
+  {
 
-	}
-	document.getElementById('current_data_body').innerHTML = content.join('');		
+    if (findIndex(current_data[i]["eid"], saved_data) === -1) {
+      checked_attribute= "";
+    }else{
+      checked_attribute="checked=true";
+    }
+
+    //cdr = current_data row
+    row = generate_current_data_row(current_data[i], checked_attribute);
+
+    content[i+1] = row;
+
+  }
+  document.getElementById('current_data_body').innerHTML = content.join('');
 }
 
 
 
 function select_all_current_data()
 {
-	checkboxes = document.getElementsByClassName('check');
-	content = [];
-	
-	for(var i=0; i < checkboxes.length; i++)
-	{
-		checkboxes[i].checked = true;
-		
-		if (findIndex(current_data[i]["eid"], saved_data) === -1) {
+  checkboxes = document.getElementsByClassName('check');
+  content = [];
 
-			row = generate_saved_data_row(current_data[i]);
+  for(var i=0; i < checkboxes.length; i++)
+  {
+    checkboxes[i].checked = true;
 
-			content[i+1] = row;			
-			saved_data.push(current_data[i]);
-		}
+    if (findIndex(current_data[i]["eid"], saved_data) === -1) {
 
-	}
-	current_saved_data_body_text 	= document.getElementById("saved_data_body").innerHTML;
-	new_saved_data_body_text		= [content.join(''), current_saved_data_body_text].join('');
-	
-	document.getElementById('saved_data_body').innerHTML = new_saved_data_body_text;
+      row = generate_saved_data_row(current_data[i]);
+
+      content[i+1] = row;
+      saved_data.push(current_data[i]);
+    }
+
+  }
+  current_saved_data_body_text  = document.getElementById("saved_data_body").innerHTML;
+  new_saved_data_body_text    = [content.join(''), current_saved_data_body_text].join('');
+
+  document.getElementById('saved_data_body').innerHTML = new_saved_data_body_text;
 }
 
 
 function deselect_all_current_data()
 {
-	current_data_rows = document.getElementsByClassName('cdr');
+  current_data_rows = document.getElementsByClassName('cdr');
 
-	for(var i=0; i < current_data_rows.length; i++)
-	{
-		//get eid from current data row
-		eid = current_data_rows[i].id.slice(2);
-		
-		//get checkbox
-		checkbox = current_data_rows[i].childNodes[0].childNodes[0];
-		
-		//mark checkbox as false
-		checkbox.checked = false;
-		
-		saved_data_index = findIndex(eid, saved_data);
-		
-		if (saved_data_index !== -1) {
+  for(var i=0; i < current_data_rows.length; i++)
+  {
+    //get eid from current data row
+    eid = current_data_rows[i].id.slice(2);
 
-			//remove element from saved_data
-			saved_data.splice(saved_data_index, 1);
-			
-			//delete row from saved_data table
-			document.getElementById(['r_',eid].join('')).remove();
-		}
-		
-	}	
+    //get checkbox
+    checkbox = current_data_rows[i].childNodes[0].childNodes[0];
+
+    //mark checkbox as false
+    checkbox.checked = false;
+
+    saved_data_index = findIndex(eid, saved_data);
+
+    if (saved_data_index !== -1) {
+
+      //remove element from saved_data
+      saved_data.splice(saved_data_index, 1);
+
+      //delete row from saved_data table
+      document.getElementById(['r_',eid].join('')).remove();
+    }
+
+  }
 }
-		
-		
+
+
 function user_clicked_checked_all()
 {
-	if(this.checked === true)
-	{
-		select_all_current_data();
-	}
-	else
-	{
-		deselect_all_current_data();
-	}
-	showHideSavedDataTable();
+  if(this.checked === true)
+  {
+    select_all_current_data();
+  }
+  else
+  {
+    deselect_all_current_data();
+  }
+  showHideSavedDataTable();
 }
 
 
 
 function select(eid)
 {
-	//this is used by the sclicked function
-	
-	saved_data_index = findIndex(eid, saved_data);
-	
-	if (saved_data_index === -1) {
+  //this is used by the sclicked function
 
-		//get data that corresponds
-		current_data_index = findIndex(eid, current_data);	
-		data = current_data[current_data_index];
-		
-		//add element to saved_data
-		saved_data.push(data);
-		
-		//add row to saved_data table
-		row = generate_saved_data_row(data);
-		
-		current_saved_data_body_text 	= document.getElementById("saved_data_body").innerHTML;
-		new_saved_data_body_text		= [row, current_saved_data_body_text].join('');
-		
-		document.getElementById('saved_data_body').innerHTML = new_saved_data_body_text;		
-	}
-	
+  saved_data_index = findIndex(eid, saved_data);
+
+  if (saved_data_index === -1) {
+
+    //get data that corresponds
+    current_data_index = findIndex(eid, current_data);
+    data = current_data[current_data_index];
+
+    //add element to saved_data
+    saved_data.push(data);
+
+    //add row to saved_data table
+    row = generate_saved_data_row(data);
+
+    current_saved_data_body_text  = document.getElementById("saved_data_body").innerHTML;
+    new_saved_data_body_text    = [row, current_saved_data_body_text].join('');
+
+    document.getElementById('saved_data_body').innerHTML = new_saved_data_body_text;
+  }
+
 }
 
 function deselect(eid)
 {
-	//this is used by the sclicked function
-	
-	saved_data_index = findIndex(eid, saved_data);
-	
-	if (saved_data_index !== -1) {
+  //this is used by the sclicked function
 
-		//remove element from saved_data
-		saved_data.splice(saved_data_index, 1);
-		
-		//delete row from saved_data table
-		document.getElementById(['r_',eid].join('')).remove();
-	}
+  saved_data_index = findIndex(eid, saved_data);
+
+  if (saved_data_index !== -1) {
+
+    //remove element from saved_data
+    saved_data.splice(saved_data_index, 1);
+
+    //delete row from saved_data table
+    document.getElementById(['r_',eid].join('')).remove();
+  }
 }
 
 
 //sclicked is for selector clicked
 function sclicked(event)
 {
-	//uncheck select all
-	document.getElementById('select_all_current_data').checked = false;
+  //uncheck select all
+  document.getElementById('select_all_current_data').checked = false;
 
-	//get eid from current data row
-	eid = event.target.parentNode.parentNode.id.slice(2);
-	
-	if(event.target.checked === true)
-	{
-		select(eid);
-	}else{
-		deselect(eid);
-	}
-	showHideSavedDataTable();
+  //get eid from current data row
+  eid = event.target.parentNode.parentNode.id.slice(2);
+
+  if(event.target.checked === true)
+  {
+    select(eid);
+  }else{
+    deselect(eid);
+  }
+  showHideSavedDataTable();
 }
 
 //rclicked is for remover clicked
 function rclicked(event)
 {
-	//get element id
-	element_id = event.target.parentNode.parentNode.id;
-	
-	//get eid from element id by removing first two characters
-	eid = element_id.slice(2);
-	
-	//remove element from saved data
-	saved_data_index = findIndex(eid, saved_data);
-	saved_data.splice(saved_data_index, 1);
-	
-	//remove this element
-	document.getElementById(element_id).remove();
-	
-	//uncheck check mark for current data
-	document.getElementById(["s_",eid].join('')).childNodes[0].childNodes[0].checked = false;
-	
-	showHideSavedDataTable();
+  //get element id
+  element_id = event.target.parentNode.parentNode.id;
+
+  //get eid from element id by removing first two characters
+  eid = element_id.slice(2);
+
+  //remove element from saved data
+  saved_data_index = findIndex(eid, saved_data);
+  saved_data.splice(saved_data_index, 1);
+
+  //remove this element
+  document.getElementById(element_id).remove();
+
+  //uncheck check mark for current data
+  document.getElementById(["s_",eid].join('')).childNodes[0].childNodes[0].checked = false;
+
+  showHideSavedDataTable();
 
 }
 
 function clear_current_data()
 {
-	$("#clear_current_data").css("display", "none");
-	$("#current_data_number").hide();
-	$("#current_data").hide();
-	current_data=[];
-	showHideCurrentDataTable();
+  $("#clear_current_data").css("display", "none");
+  $("#current_data_number").hide();
+  $("#current_data").hide();
+  current_data=[];
+  showHideCurrentDataTable();
 }
 
 function clear_saved_data()
 {
-	saved_data = [];
-	deselect_all_current_data();
-	showHideSavedDataTable();
+  saved_data = [];
+  deselect_all_current_data();
+  showHideSavedDataTable();
 }
 
 function build_current_data(data) {
@@ -293,29 +384,29 @@ function build_current_data(data) {
     var default_unknown = "N/A";
     current_data = [];
     for (var i = 0; i < data.length; i++) {
-	dsid = make_default_when_undefined(data[i]["dsid"], default_unknown);
+  dsid = make_default_when_undefined(data[i]["dsid"], default_unknown);
         eid = make_default_when_undefined(data[i]["eid"], default_unknown);
         crid = make_default_when_undefined(data[i]["crid"], default_unknown);
         pdate = make_default_when_undefined(data[i]["pdate"], default_unknown);
         institution = make_default_when_undefined(data[i]["institution"], default_unknown);
         fl_loc_1 = make_default_when_undefined(data[i]["fl_loc_1"], default_unknown);
-	fl_loc_2 = make_default_when_undefined(data[i]["fl_loc_2"], default_unknown);
+  fl_loc_2 = make_default_when_undefined(data[i]["fl_loc_2"], default_unknown);
         exname = make_default_when_undefined(data[i]["exname"], default_unknown);
         rating = make_default_when_undefined(data[i]["rating"], "unrated");
-	cul_name = make_default_when_undefined(data[i]["cul_name"], default_unknown);
-        
-		if (findIndex(eid, saved_data) === -1) {
+  cul_name = make_default_when_undefined(data[i]["cul_name"], default_unknown);
+
+    if (findIndex(eid, saved_data) === -1) {
             checked = false;
         } else {
             checked = true;
         }
-		
-		checked = true;
-        current_data.push({'dsid':dsid, 'eid':eid, 'crid':crid, 'pdate':pdate.substr(0,4)+"-"+pdate.substr(4,2)+"-"+pdate.substr(6,2), 'fl_loc_2':fl_loc_2, 'institution':institution, 'fl_loc_1':fl_loc_1, 
-		'exname':exname, 'rat':rating, 'cul_name':cul_name, 'checked':checked});
+
+    checked = true;
+        current_data.push({'dsid':dsid, 'eid':eid, 'crid':crid, 'pdate':pdate.substr(0,4)+"-"+pdate.substr(4,2)+"-"+pdate.substr(6,2), 'fl_loc_2':fl_loc_2, 'institution':institution, 'fl_loc_1':fl_loc_1,
+    'exname':exname, 'rat':rating, 'cul_name':cul_name, 'checked':checked});
     }
-	showHideCurrentDataTable();
-	build_current_data_table(current_data);
+  showHideCurrentDataTable();
+  build_current_data_table(current_data);
 
 }
 
@@ -372,28 +463,28 @@ $("#apply_filter").click(function(e) {
 
 function extractEids(ex){
 //used for downloading data. This function returns an array of eids
-	var dl = [];
-	for (i = 0; i < ex.length; i++) {
-	    var added = false;
-	    var eid = ex[i].eid;
-	    var dsid = ex[i].dsid;
-	    for(j = 0; j < dl.length; j++) {
-		if(dl[j].dsid == dsid) {
-		  if (dl[j].eids.indexOf(eid) == -1) {
-		      dl[j].eids.push(eid);
-		      added = true;
-		      break;
-		  }
-		}
+  var dl = [];
+  for (i = 0; i < ex.length; i++) {
+      var added = false;
+      var eid = ex[i].eid;
+      var dsid = ex[i].dsid;
+      for(j = 0; j < dl.length; j++) {
+    if(dl[j].dsid == dsid) {
+      if (dl[j].eids.indexOf(eid) == -1) {
+          dl[j].eids.push(eid);
+          added = true;
+          break;
+      }
+    }
             }
-	    if (!added) {
-		var y = [];
-		y.push(eid);
-		var x = {'dsid': dsid, 'eids':y};
-		dl.push(x);
-	    }
-	}
-	return dl;
+      if (!added) {
+    var y = [];
+    y.push(eid);
+    var x = {'dsid': dsid, 'eids':y};
+    dl.push(x);
+      }
+  }
+  return dl;
 }
 
 $("#download_data").click(function() {
@@ -493,11 +584,11 @@ function obtain_specific_crop_map_population(crop_type) {
 }
 
 function retrieve_data(crop_type, geohashes, eid_count) {
-    max_eids = 1500;
-    if (eid_count > max_eids) {
-        $("#error_message").html("Data Size Is Too Large. More Than Data Points " + max_eids + " Selected. <br>Please Specify Data By Using Filter Or By Zooming In.");
-        $("#alertModal").modal("show");
-    } else {
+    //max_eids = 1500;
+    //if (eid_count > max_eids) {
+    //    $("#error_message").html("Data Size Is Too Large. More Than Data Points " + max_eids + " Selected. <br>Please Specify Data By Using Filter Or By Zooming In.");
+    //    $("#alertModal").modal("show");
+    //} else {
         $("#spinner").modal("show");
         var packed = {};
         packed.locations = geohashes;
@@ -520,25 +611,29 @@ function retrieve_data(crop_type, geohashes, eid_count) {
         }).always(function() {
             $("#spinner").modal("hide");
             document.getElementById("select_all_current_data").checked = false;
-			
         });
-    }
+    //}
 }
 
 function retrieve_database(database_types, items) {
     // Currently only download the items.
+    var download_req = {};
     var download_items = items;//{'types':database_types, 'items': items};
-    
+    var u = urlObject(window.location);
     $("#spinner").modal("show");
-    
+    if(u.parameters.hasOwnProperty('galaxy_url'))
+      download_req['galaxy_url'] = u['parameters']['galaxy_url'];
+    if(u.parameters.hasOwnProperty('tool_id'))
+      download_req['tool_id'] = u['parameters']['tool_id'];
     //database_types = JSON.stringify(database_types);
+    download_req['downloads'] = download_items;
     options = {
         type: "POST",
         url: api_url+"/download",
         data: JSON.stringify(download_items),
         //cache: true,
         dataType: "json",
-	contentType: "application/json"
+  contentType: "application/json"
     };
     $.ajax(options).done(function(result) {
         $("#map").trigger("prompt_user_for_download", result);

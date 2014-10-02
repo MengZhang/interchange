@@ -550,12 +550,6 @@ function getParameterByName(name) {
 }
 
 function obtain_initial_map_population() {
-  // Check for the GALAXY_URL parameter
-  var galaxy_url = getParameterByName("GALAXY_URL");
-  if(galaxy_url != "") {
-    $("#galaxy_data").css('visibility', 'visible');
-    $("#download_data").css('visibility', 'hidden');
-  }
   $("#spinner").modal("show");
   options = {
     type: "GET",
@@ -639,7 +633,7 @@ function retrieve_database(database_types, items) {
   options = {
     type: "POST",
     url: api_url+"/download",
-    data: JSON.stringify(download_items),
+    data: JSON.stringify(download_req),
     //cache: true,
     dataType: "json",
     contentType: "application/json"

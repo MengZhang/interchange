@@ -52,8 +52,10 @@
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Databases <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li><a href="@interchange.controllers.routes.AceWebUI.index">AgMIP Crop Site Database</a></li>
+                @if(!request.getQueryString("GALAXY_URL")) {
                 <li class="divider"></li>
                 <li> <a href="@interchange.controllers.routes.AceWebUI.uploadForm">Upload Data</a></li>
+                }
               </ul>
               </li>
               <li class="dropdown">
@@ -67,6 +69,7 @@
             </ul>
           </div><!--/.nav-collapse -->
           <div class="collapse navbar-collapse navbar-ex1-collapse pull-right menuPad">
+            @if(!request.getQueryString("GALAXY_URL")) {
             <ul class="nav navbar-nav navbar-right navbar-user ">
               @if(session.get("uid") != None) {
               <li class="dropdown">
@@ -84,6 +87,7 @@
               </li>
               }
             </ul>
+            }
           </div><!-- /.navbar-collapse -->
         </div>
       </div>

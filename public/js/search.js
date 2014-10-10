@@ -623,9 +623,11 @@ function retrieve_database(database_types, items) {
   var download_req = {};
   var download_items = items;//{'types':database_types, 'items': items};
   var u = urlObject(window.location);
+  var galaxied = false;
   $("#spinner").modal("show");
   if(u.parameters.hasOwnProperty('galaxy_url'))
-    download_req['galaxy_url'] = u['parameters']['galaxy_url'];
+    download_req['galaxy_url'] = decodeURIComponent(u['parameters']['galaxy_url']);
+    galaxied = true;
   if(u.parameters.hasOwnProperty('tool_id'))
     download_req['tool_id'] = u['parameters']['tool_id'];
   //database_types = JSON.stringify(database_types);
@@ -639,7 +641,12 @@ function retrieve_database(database_types, items) {
     contentType: "application/json"
   };
   $.ajax(options).done(function(result) {
-    $("#map").trigger("prompt_user_for_download", result);
+    if(galaxied) {
+      var forward = decodeURIComponent(u['parameters']['galaxy_url'])+"?tool_id="+u['parameters']['tool_id']+"&URL="+result.url+"&URL_method=get";
+      window.top.location.href = forward;
+    } else {
+      $("#map").trigger("prompt_user_for_download", result);
+    }
   }).fail(function() {
     $("#error_message").text("Error: Failed to Download Database");
     $("#alertModal").modal("show");

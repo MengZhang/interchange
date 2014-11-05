@@ -620,18 +620,31 @@ function retrieve_data(crop_type, geohashes, eid_count) {
 
 function retrieve_database(database_types, items) {
   // Currently only download the items.
+  var file_types = 0;
+  if(database_types.indexOf("ACE") != -1) {
+    file_types |= 1;
+  }
+  if(database_types.indexOf("DOME") != -1 {
+    file_types |= 2;
+  }
+  if(database_types.indexOf("ACMO") != -1) {
+    file_types |= 4;
+  }
   var download_req = {};
   var download_items = items;//{'types':database_types, 'items': items};
   var u = urlObject(window.location);
   var galaxied = false;
   $("#spinner").modal("show");
-  if(u.parameters.hasOwnProperty('galaxy_url'))
-    download_req['galaxy_url'] = decodeURIComponent(u['parameters']['galaxy_url']);
-    galaxied = true;
-  if(u.parameters.hasOwnProperty('tool_id'))
-    download_req['tool_id'] = u['parameters']['tool_id'];
+    if(u.parameters.hasOwnProperty('galaxy_url') && (u['parameters']['galaxy_url'] != undefined)) {
+	download_req['galaxy_url'] = decodeURIComponent(u['parameters']['galaxy_url']);
+	galaxied = true;
+    }
+    if(u.parameters.hasOwnProperty('tool_id')) {
+	download_req['tool_id'] = u['parameters']['tool_id'];
+    }
   //database_types = JSON.stringify(database_types);
   download_req['downloads'] = download_items;
+  download_req['type'] = file_types;
   options = {
     type: "POST",
     url: api_url+"/download",

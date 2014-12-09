@@ -11,6 +11,7 @@ import scala.concurrent.Future
 import play.api.Play.current
 
 import interchange.util.InterchangeConfig
+import interchange.util.CrowdAuth
 
 import views.html.acewebui._
 
@@ -31,7 +32,11 @@ object AceWebUI extends Controller {
     }
   }
 
-  def uploadForm = TODO
+  def uploadForm = CrowdAuth { implicit request =>
+    val u = request.session.get("uid")
+    Ok(u.getOrElse("undone"))
+  }
+
   def parseUpload = TODO
   def finalizeUpload = TODO
 }

@@ -1,6 +1,8 @@
 package interchange.controllers
 
 import play.api._
+import play.api.data._
+import play.api.data.Forms._
 import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.ws._
@@ -19,6 +21,9 @@ object AceWebUI extends Controller {
   implicit val context = play.api.libs.concurrent.Execution.Implicits.defaultContext
   case class CropCache(crid: String, name: String)
   implicit val cropCacheReads = Json.reads[CropCache]
+  case class CreateParams(dsid: String, title: Option[String], dest: String)
+  implicit val createParamsReads = Json.reads[CreateParams]
+
 
   def index = Action.async { implicit request =>
     WS.url(InterchangeConfig.cropsitedbUrl+"/cache/crop").get().map {
@@ -32,11 +37,36 @@ object AceWebUI extends Controller {
     }
   }
 
-  def uploadForm = CrowdAuth { implicit request =>
-    val u = request.session.get("uid")
-    Ok(u.getOrElse("undone"))
+  def uploadFirst = CrowdAuth { implicit request =>
+    Ok(views.html.acewebui.uploadfirst())
   }
 
-  def parseUpload = TODO
+  def uploadFiles = CrowdAuth.async { implicit request =>
+    val friendlyForm = Form(single("friendlyName"->nonEmptyText))
+    val u = request.session.get("uid")
+    friendlyForm.bindFromRequest.fold(
+      badData =>
+        Future.successful(BadRequest("Missing Friendly Name")),
+      d => {
+        u match {
+          case Some(x) => {
+            val dsOpts = Json.obj(
+              "email" -> u,
+              "title" -> d,
+              "freeze" -> true
+              )
+            WS.url(InterchangeConfig.cropsitedbUrl+"/dataset/create").post(dsOpts).map { res =>
+              val ret = (res.json).validate[CreateParams]
+              ret match {
+                case s: JsSuccess[CreateParams] => Ok(views.html.acewebui.uploadfiles(s.get.dsid))
+                case e: JsError => BadRequest(JsError.toFlatJson(e).toString())
+              }
+            }
+          }
+          case None    => Future.successful(BadRequest("Missing Login Information"))
+        }
+      }
+      )
+  }
   def finalizeUpload = TODO
 }

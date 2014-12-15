@@ -591,3 +591,31 @@ height:auto !important;
 #galaxy_data {
   visibility: hidden;
 }
+
+#files {
+  border: 1px solid #999999;
+  background-color: #f8f8f8;
+  min-height: 100px;
+}
+
+.dz-details{
+  display: inline !important;
+}
+
+.dz-filename {
+  display: inline !important;
+}
+.dz-size {
+  display: inline !important;
+}
+.dz-progress {
+  display: inline !important;
+}
+
+.dz-success-mark, .dz-error-mark, .dz-error-message {
+  display: inline !important;
+}
+
+.dz-file-type {
+  display: inline !important;
+}

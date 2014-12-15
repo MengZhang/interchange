@@ -14,8 +14,6 @@ import play.api.Play.current
 
 import interchange.util._
 
-import plugins.RestedCrowdPlugin
-
 object CrowdAuth extends ActionBuilder[Request] {
   def invokeBlock[A](req: Request[A], block: (Request[A]) => Future[Result]) = {
     val token = req.cookies.get("crowd.token_key")

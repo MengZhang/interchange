@@ -1,0 +1,47 @@
+@(dsid: String)(implicit request: RequestHeader, session: Session)
+@import interchange.util.InterchangeConfig
+
+@scripts = {
+<link rel="stylesheet" href="@routes.Assets.at("css/dropzone.css")" />
+<script src="@routes.Assets.at("js/dropzone.js")"></script>
+<script>
+var dz = new Dropzone('#files', {
+  url: "@InterchangeConfig.cropsitedbUrl/dataset/@dsid/add",
+  addRemoveLinks: true,
+  previewTemplate: '<div class="dz-preview dz-file-preview"><div class="dz-details"><div class="dz-filename"><span data-dz-name></span></div><div class="dz-size" data-dz-size></div></div><div class="dz-progress"><span class="dz-upload" data-da-uploadprogress></span></div><div class="dz-success-mark"></div><div class="dz-error-mark"></div><div class="dz-error-message"><span data-dz-errormessage></span></div><div class="dz-file-type"><span data-dz-filetype></span></div></div>',
+  init: function() {
+    this.on("sending", function(f) {
+      $("#finalize").prop("disabled", true);
+    });
+    this.on("queuecomplete", function() {
+      $("#finalize").prop("disabled", false);
+    });
+    this.on("success", function(f, res) {
+      console.log(f);
+      _ref = f.previewElement.querySelectorAll("[data-dz-filetype]");
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        node = _ref[_i];
+        node.textContent = res.body;
+      }
+    });
+  }});
+</script>
+}
+
+@base("AgMIP Data Interchange - Crop Site Database - Upload", Html(""), scripts, Html(""), Html(""), Html("")) {
+<div class="row">
+  <div class="col-sm-12">
+    <h1>Upload to Crop Site Database - File Upload</h1>
+  </div>
+</div>
+<div class="row">
+  <div id="files" class="col-sm-12"></div>
+</div>
+<div class="row">
+  <form method="post" action="">
+    <div class="form-group">
+      <button type="submit" class="btn btn-default" id="finalize">Next <i class="fa fa-angle-double-right"></i></button>
+    </div>
+  </form>
+</div>
+}

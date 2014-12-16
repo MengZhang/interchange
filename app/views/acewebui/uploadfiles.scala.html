@@ -17,11 +17,10 @@ var dz = new Dropzone('#files', {
       $("#finalize").prop("disabled", false);
     });
     this.on("success", function(f, res) {
-      console.log(f);
       _ref = f.previewElement.querySelectorAll("[data-dz-filetype]");
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         node = _ref[_i];
-        node.textContent = res.body;
+        node.textContent = res.filetype;
       }
     });
   }});

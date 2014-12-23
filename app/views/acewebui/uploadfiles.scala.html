@@ -5,8 +5,28 @@
 <link rel="stylesheet" href="@routes.Assets.at("css/dropzone.css")" />
 <script src="@routes.Assets.at("js/dropzone.js")"></script>
 <script>
+if (typeof String.prototype.endsWith !== 'function') {
+    String.prototype.endsWith = function(suffix) {
+        return this.indexOf(suffix, this.length - suffix.length) !== -1;
+    };
+}
+
+if (typeof String.prototype.startsWith !== 'function') {
+    String.prototype.startsWith = function(prefix) {
+        return this.indexOf(prefix) == 0;
+    };
+}
+
+
+
 var dz = new Dropzone('#files', {
   url: "@InterchangeConfig.cropsitedbUrl/dataset/@dsid/add",
+  accept: function(f, d) {
+    var fext = f.name.substring(f.name.lastIndexOf(".")+1);
+    if(fext == "out" || fext.startsWith("xls")) {
+      d("Invalid file");
+    } else { d(); }
+  },
   addRemoveLinks: true,
   previewTemplate: '<div class="dz-preview dz-file-preview"><div class="dz-details"><div class="dz-filename"><span data-dz-name></span></div><div class="dz-size" data-dz-size></div></div><div class="dz-progress"><span class="dz-upload" data-da-uploadprogress></span></div><div class="dz-success-mark"></div><div class="dz-error-mark"></div><div class="dz-error-message"><span data-dz-errormessage></span></div><div class="dz-file-type"><span data-dz-filetype></span></div></div>',
   init: function() {
@@ -15,6 +35,17 @@ var dz = new Dropzone('#files', {
     });
     this.on("queuecomplete", function() {
       $("#finalize").prop("disabled", false);
+    });
+    this.on("removedfile", function(f) {
+      var j = {}
+      j.email = "@session.get("uid")";
+      j.file = f.name;
+      $.ajax({
+        url: "@InterchangeConfig.cropsitedbUrl/dataset/@dsid/delete",
+        type: 'POST',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify(j)});
     });
     this.on("success", function(f, res) {
       _ref = f.previewElement.querySelectorAll("[data-dz-filetype]");

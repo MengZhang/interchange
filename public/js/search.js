@@ -624,7 +624,7 @@ function retrieve_database(database_types, items) {
   if(database_types.indexOf("ACE") != -1) {
     file_types |= 1;
   }
-  if(database_types.indexOf("DOME") != -1 {
+	if(database_types.indexOf("DOME") != -1) {
     file_types |= 2;
   }
   if(database_types.indexOf("ACMO") != -1) {

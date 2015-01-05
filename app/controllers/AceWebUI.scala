@@ -68,5 +68,26 @@ object AceWebUI extends Controller {
       }
       )
   }
-  def finalizeUpload = TODO
+
+  def finalizeUpload = CrowdAuth.async { implicit request =>
+    val u = request.session.get("uid")
+    val friendlyForm = Form(single("dsid"->nonEmptyText))
+    friendlyForm.bindFromRequest.fold(
+      badData => Future.successful(BadRequest("Invalid DSID")),
+      d => {
+        u match {
+          case Some(x) => {
+            val dsOpts = Json.obj(
+              "email" -> u,
+              "dsid"  -> d
+            )
+            WS.url(InterchangeConfig.cropsitedbUrl+"/dataset/"+d+"/finalize").post(dsOpts).map { res =>
+              Ok("Processing")
+            }
+          }
+		      case None => Future.successful(BadRequest("Missing login information"))
+        }
+      }
+    )
+  }
 }

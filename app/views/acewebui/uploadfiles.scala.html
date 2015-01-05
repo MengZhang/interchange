@@ -68,8 +68,9 @@ var dz = new Dropzone('#files', {
   <div id="files" class="col-sm-12"></div>
 </div>
 <div class="row">
-  <form method="post" action="">
+  <form method="post" action="/cropsitedb/uploadFinal">
     <div class="form-group">
+      <input type="hidden" name="dsid" value="@dsid" />
       <button type="submit" class="btn btn-default" id="finalize">Next <i class="fa fa-angle-double-right"></i></button>
     </div>
   </form>

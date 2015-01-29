@@ -1,34 +1,24 @@
 @()(implicit request: RequestHeader, session: Session)
 @base("AgMIP Data Interchange - Home", Html("txtcnt")) {
 <!--  Main top text and image are coded here -->
-      		<div class="headerRow txtcnt disIn" >
-        		<h1 class="homepageTitle"><div style="position:relative; top:1px;display:inline;font-size:20px;">Data Interchange</div></h1>	
-       		</div>
-          <p class="txtcnt" style="position:relative; top:-10px;">Welcome to the AgMIP Data Interchange web portal, designed to provide open access to AgMIP member data.<br>Please sign up for free membership to access all site features and upload data. If you are already a member please login above.
-			<img src="@routes.Assets.at("images/header_divider.png")" class="col-sm-12 mainImage" />
-					</p>
-      </div>
-      <div class="container bottomHomeContent">
-             <div class="col-sm-6">
-        	            <!--<h3 class="homepageTitleSecTxt txtcnt"><span class="glyphicon glyphicon-search"></span> Search the Globe and Download Data</h3>-->
-        	            <h3 class="homepageTitleSecTxt txtcnt"> Search the Globe and Download Data</h3>
-                      <p class="txtcnt margBoth">The AgMIP Data Interchange provides open access to global and regional climate, agricultural, and economic data uploaded by AgMIP members. It also provides connections to collaborating databases. Click below to start your search and download data. <!-- Terms of use --></p>
-<p class="txtcnt">
-<br / >
-<a href="@interchange.controllers.routes.AceWebUI.index"><img src="@routes.Assets.at("images/searchScreen.png")" class="col-sm-10 floNone"/></a>
-<br /> <br /> 
-<a class="homepage_btn" href="@interchange.controllers.routes.AceWebUI.index">Start your Search</a></p>
-        	         </div>
-             <div class="col-sm-6">
-        	            <!--<h3 class="homepageTitleSecTxt"><span class="glyphicon glyphicon-cloud-upload"></span> Upload your data</h3>-->
-        	            <h3 class="homepageTitleSecTxt txtcnt"> Upload your data</h3>
-                      <p class="txtcnt margBoth">Upload your climate, agricultural, and economic data to share with other researchers by signing up to become an AgMIP member. Members also have instant access to all site features. Click below to sign up for free membership. <!-- terms of use --></p>
-<p class="txtcnt">
- <br />
- <a href="@interchange.controllers.routes.AceWebUI.uploadFirst"><img src="@routes.Assets.at("images/uploadScreen.png")" class="col-sm-10 floNone"/></a>
-<br /> <br /> 
-<a href="@interchange.controllers.routes.AceWebUI.uploadFirst" class="homepage_btn">Sign Up Now to Upload</a></p>
-        	         </div>
-      </div>
+<div class="headerRow txtcnt disIn" >
+  <h1 class="homepageTitle"><div style="position:relative; top:1px;display:inline;font-size:20px;">Data Interchange</div></h1>	
+</div>
+<p class="txtcnt" style="position:relative; top:-10px;">Welcome to the AgMIP Data Interchange web portal, designed to provide open access to AgMIP member data.<br>Please sign up for free membership to access all site features and upload data. If you are already a member please login above.
+	<img src="@routes.Assets.at("images/header_divider.png")" class="col-sm-12 mainImage" />
+</p>
+</div>
+<div class="container bottomHomeContent">
+  <div class="col-sm-12">
+    <!--<h3 class="homepageTitleSecTxt txtcnt"><span class="glyphicon glyphicon-search"></span> Search the Globe and Download Data</h3>-->
+    <h3 class="homepageTitleSecTxt txtcnt"> Search the Globe and Download Data</h3>
+    <p class="txtcnt margBoth">The AgMIP Data Interchange provides open access to global and regional climate, agricultural, and economic data uploaded by AgMIP members. It also provides connections to collaborating databases. Click below to start your search and download data. <!-- Terms of use --></p>
+    <p class="txtcnt">
+      <br / >
+      <a href="@interchange.controllers.routes.AceWebUI.index"><img src="@routes.Assets.at("images/searchScreen.png")" style="width: 405px; height: 305px;" class="col-sm-10 floNone"/></a>
+      <br /> <br /> 
+      <a class="homepage_btn" href="@interchange.controllers.routes.AceWebUI.index">Start your Search</a></p>
+  </div>
+</div>
 
 }

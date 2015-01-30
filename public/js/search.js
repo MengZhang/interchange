@@ -540,8 +540,8 @@ $(".modal").on("hide.bs.modal", function() {
   $(this).css("overflow-y", "auto");
 });
 
-//var api_url = "https://api.agmip.org/cropsitedb/2";
-var api_url = "http://crash1.ufl.agmip.org:8080/cropsitedb/2";
+var api_url = "https://api.agmip.org/cropsitedb/2";
+//var api_url = "http://crash1.ufl.agmip.org:8080/cropsitedb/2";
 
 function getParameterByName(name) {
   name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");

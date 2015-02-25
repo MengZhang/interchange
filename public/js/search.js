@@ -649,7 +649,7 @@ function retrieve_database(database_types, items) {
     }
   //database_types = JSON.stringify(database_types);
   download_req['downloads'] = download_items;
-  download_req['type'] = file_types;
+  download_req['types'] = file_types;
   options = {
     type: "POST",
     url: api_url+"/download",

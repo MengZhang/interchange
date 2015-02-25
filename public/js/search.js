@@ -157,12 +157,15 @@ function showHideSavedDataTable()
 function generate_current_data_row(experiment, checked_attribute)
 {
 
-  row= ["<tr class='cdr' id='s_",experiment["eid"],"' ><td><input ",checked_attribute," type='checkbox' class='check' onclick='sclicked(event)'></td><td>",experiment["crid"],
+  row= ["<tr class='cdr' id='s_",experiment["eid"],"' ><td>",
+  "<input ",checked_attribute," type='checkbox' class='check' onclick='sclicked(event)'>","</td><td>",experiment["crid"],
     "</td><td>", experiment["exname"] , "</td><td>", experiment["fl_loc_1"],    "</td><td>", experiment["fl_loc_2"],
     "</td><td>", experiment["institution"] , "</td><td>", experiment["cul_name"] , "</td><td>", experiment["pdate"] ,
-    "</td><td>", experiment["rat"], "</td>"].join('');
-
-  return row;
+    "</td><td>", experiment["api"], "</td>"];
+  if("AgTrials" == experiment["api"]) {
+    row.splice(3,3);
+  }
+  return row.join('');
 }
 
 function generate_saved_data_row(experiment)
@@ -171,7 +174,7 @@ function generate_saved_data_row(experiment)
     "'><td><span class='glyphicon glyphicon-remove' onclick='rclicked(event)' ></span></td><td>",,experiment["crid"],
     "</td><td>", experiment["exname"] , "</td><td>", experiment["fl_loc_1"],    "</td><td>", experiment["fl_loc_2"],
     "</td><td>", experiment["institution"] , "</td><td>", experiment["cul_name"] , "</td><td>", experiment["pdate"] ,
-    "</td><td>", experiment["rat"], "</td>"].join('');
+    "</td><td>", experiment["api"], "</td>"].join('');
 
   return row;
 }
@@ -379,7 +382,7 @@ function build_current_data(data) {
   var fl_loc_2;
   var exname;
   var cul_name;
-  var rating;
+  var api_source;
   var checked;
   var default_unknown = "N/A";
   current_data = [];
@@ -392,7 +395,7 @@ function build_current_data(data) {
     fl_loc_1 = make_default_when_undefined(data[i]["fl_loc_1"], default_unknown);
     fl_loc_2 = make_default_when_undefined(data[i]["fl_loc_2"], default_unknown);
     exname = make_default_when_undefined(data[i]["exname"], default_unknown);
-    rating = make_default_when_undefined(data[i]["rating"], "unrated");
+    api_source = make_default_when_undefined(data[i]["api_source"], "AgMIP");
     cul_name = make_default_when_undefined(data[i]["cul_name"], default_unknown);
 
     if (findIndex(eid, saved_data) === -1) {
@@ -403,7 +406,7 @@ function build_current_data(data) {
 
     checked = true;
     current_data.push({'dsid':dsid, 'eid':eid, 'crid':crid, 'pdate':pdate.substr(0,4)+"-"+pdate.substr(4,2)+"-"+pdate.substr(6,2), 'fl_loc_2':fl_loc_2, 'institution':institution, 'fl_loc_1':fl_loc_1,
-      'exname':exname, 'rat':rating, 'cul_name':cul_name, 'checked':checked});
+      'exname':exname, 'api':api_source, 'cul_name':cul_name, 'checked':checked});
   }
   showHideCurrentDataTable();
   build_current_data_table(current_data);
@@ -587,6 +590,8 @@ function obtain_specific_crop_map_population(crop_type) {
   });
 }
 
+function stripNulls(element) { return null != element; }
+
 function retrieve_data(crop_type, geohashes, eid_count) {
   //max_eids = 1500;
   //if (eid_count > max_eids) {
@@ -595,7 +600,7 @@ function retrieve_data(crop_type, geohashes, eid_count) {
   //} else {
   $("#spinner").modal("show");
   var packed = {};
-  packed.locations = geohashes;
+  packed.locations = geohashes.filter(stripNulls);
   if(crop_type != "none") {
     packed.crid = crop_type;
   }

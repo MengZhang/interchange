@@ -179,7 +179,7 @@ function generate_saved_data_row(experiment)
   return row;
 }
 
-function build_current_data_table(data)
+function build_current_data_table()
 {
   content=[];
   for(var i=0; i< current_data.length; i++)
@@ -240,7 +240,7 @@ function deselect_all_current_data()
     checkbox = current_data_rows[i].childNodes[0].childNodes[0];
 
     //mark checkbox as false
-    checkbox.checked = false;
+    if (undefined != checkbox) checkbox.checked = false;
 
     saved_data_index = findIndex(eid, saved_data);
 
@@ -424,7 +424,6 @@ $("#obtain_data").click(function() {
   var geohashes = [];
   var map_bounds = map.getBounds();
   var eid_count = 0;
-  var marker;
   markerLayer.eachLayer(function(marker) {
     if (map_bounds.contains(marker.getLatLng())) {
       geohashes.push(marker.options.geohash);
@@ -434,7 +433,7 @@ $("#obtain_data").click(function() {
   retrieve_data(crop_id, geohashes, eid_count);
 });
 
-$("#map").on("click", ".obtain_data_from_cluster_or_marker", function(event) {
+$("#map").on("click", ".obtain_data_from_cluster_or_marker", function() {
   var geohashes = $(this).data("geohashes");
   var eid_count = $(this).data("eid_count");
   var crop_id   = $('#crop_filter').val();
@@ -591,7 +590,7 @@ function obtain_specific_crop_map_population(crop_type) {
 
 function stripNulls(element) { return null != element; }
 
-function retrieve_data(crop_type, geohashes, eid_count) {
+function retrieve_data(crop_type, geohashes) {
   //max_eids = 1500;
   //if (eid_count > max_eids) {
   //    $("#error_message").html("Data Size Is Too Large. More Than Data Points " + max_eids + " Selected. <br>Please Specify Data By Using Filter Or By Zooming In.");

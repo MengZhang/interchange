@@ -11,6 +11,7 @@ import scala.concurrent.Future
 
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.Play.current
+import play.Logger
 
 import interchange.util._
 
@@ -37,6 +38,32 @@ object CrowdAuth extends ActionBuilder[Request] {
         }
       }
       case None => redirectLogin 
+    }
+  }
+}
+
+object ProfileAction extends ActionBuilder[Request] {
+  def invokeBlock[A](req: Request[A], block: (Request[A]) => Future[Result]) = {
+    val token = req.cookies.get("crowd.token_key")
+    val uid   = req.session.get("uid")
+    uid match {
+      case Some(u) => Logger.debug("Found uid"); block(req)
+      case None    => {
+        token match {
+          case None => Logger.debug("No auth token found"); block(req)
+          case Some(t) => {
+            // The user is logged in somewhere but not displaying at this point
+            WS.url(InterchangeConfig.tollboothUrl+"/email/"+t.value).get.flatMap { r =>
+              if(r.status == 200) {
+                val j = (r.json \ "email").as[String]
+                block(req).map(_.withSession("uid"->j))
+              } else {
+                block(req)
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

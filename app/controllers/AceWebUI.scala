@@ -31,9 +31,14 @@ object AceWebUI extends Controller {
         val cropCache = (res.json).validate[Seq[CropCache]]
         cropCache match {
           case s: JsSuccess[Seq[CropCache]] => Ok(views.html.acewebui.index(s.get))
-          case e: JsError => BadRequest(JsError.toFlatJson(e).toString())
+          case e: JsError => Ok(views.html.acewebui.index(Seq()))
         }
       }
+    }.recover {
+      case e: Throwable =>
+        Logger.error("Cannot connect to an api", e)
+        // TODO: Make a prettier page for failure
+        Ok(views.html.acewebui.index(Seq()))
     }
   }
 

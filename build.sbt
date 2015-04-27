@@ -1,6 +1,6 @@
 name := """interchange"""
 
-version := "1.0-SNAPSHOT"
+version := "0.9.0"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 

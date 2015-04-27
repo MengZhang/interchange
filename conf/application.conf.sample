@@ -8,7 +8,7 @@
 # This must be changed for production, but we recommend not changing it in this file.
 #
 # See http://www.playframework.com/documentation/latest/ApplicationSecret for more details.
-application.secret="du=yo1dwDrg_6c5R3Z`IG=sbCK1]AnL:X^]Z09SK[Od<Pyr8qbg]jAbYVNuufkTK"
+application.secret="changeme"
 
 # The application languages
 # ~~~~~
@@ -60,5 +60,5 @@ logger.play=INFO
 # Logger provided to your application:
 logger.application=DEBUG
 
-cropsitedb.baseurl="http://localhost:8080/cropsitedb/2"
-tollbooth.baseurl ="http://crash1.ufl.agmip.org:9110"
+cropsitedb.baseurl="http://localhost:9000/cropsitedb/2"
+tollbooth.baseurl ="https://localhost:8080/"

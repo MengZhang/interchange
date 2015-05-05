@@ -18,3 +18,4 @@ conf/application.conf
 *~
 *.swp
 .DS_Store
+node_modules

@@ -1,10 +1,12 @@
 name := """interchange"""
 
-version := "0.9.0"
+version := "0.9.1"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.11.6"
+
+crossPaths := false
 
 libraryDependencies ++= Seq(
   jdbc,

@@ -71,9 +71,13 @@
           <div class="collapse navbar-collapse navbar-ex1-collapse pull-right menuPad">
             @if(!request.getQueryString("GALAXY_URL")) {
             <ul class="nav navbar-nav navbar-right navbar-user ">
-              @if(session.get("uid") != None && request.cookies.get("crowd.token_key") != None) {
+              @if((session.get("uid") != None || request.cookies.get("username") != None) && request.cookies.get("crowd.token_key") != None) {
               <li class="dropdown">
+                @if(request.cookies.get("username") != None) {
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> @(request.cookies.get("username") match {case Some(t) => t.value; case None => ""}) <b class="caret"></b></a>
+                } else {
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> @request.session.get("uid") <b class="caret"></b></a>
+                }                
                 <ul class="dropdown-menu">
                   <li><a href="@InterchangeConfig.tollboothUrl/logout?for=@InterchangeConfig.myScheme://@request.host@request.path">Logout</a></li>
                 </ul>

@@ -6,6 +6,7 @@ object InterchangeConfig {
   val myScheme = Play.current.configuration.getString("interchange.scheme").getOrElse("http")
   val tollboothUrl = rewriteUrl(Play.current.configuration.getString("tollbooth.baseurl").getOrElse("http://localhost:9110"))
   val cropsitedbUrl = rewriteUrl(Play.current.configuration.getString("cropsitedb.baseurl").getOrElse("http://localhost:8080/cropsitedb/2"))
+  val autoSubmit = Play.current.configuration.getBoolean("auto_submit").getOrElse(true)
 
   def rewriteUrl(url: String):String = {
     if (url.endsWith("/")) {

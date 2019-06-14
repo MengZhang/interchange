@@ -58,7 +58,7 @@ object AceWebUI extends Controller {
             val dsOpts = Json.obj(
               "email" -> u,
               "title" -> d,
-              "freeze" -> true
+              "freeze" -> !InterchangeConfig.autoSubmit
               )
             WS.url(InterchangeConfig.cropsitedbUrl+"/dataset/create").post(dsOpts).map { res =>
               val ret = (res.json).validate[CreateParams]

@@ -62,3 +62,4 @@ logger.application=DEBUG
 
 cropsitedb.baseurl="http://localhost:9000/cropsitedb/2"
 tollbooth.baseurl ="https://localhost:8080/"
+auto_submit=true

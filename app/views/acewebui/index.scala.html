@@ -1,10 +1,13 @@
 @(crops: Seq[interchange.controllers.AceWebUI.CropCache])(implicit request: RequestHeader, session: Session)
 @import interchange.util.InterchangeConfig
 
-@scripts = {
+@css = {
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.2/leaflet.css" />
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.css" />
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.Default.css" />
+}
+
+@scripts = {
 <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.2/leaflet.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/leaflet.markercluster.js"></script>
 <script src="@routes.Assets.at("js/search.min.js")"></script>
@@ -97,7 +100,7 @@
   <!-- Spinner Modal-->
   }
 
-  @base("AgMIP Data Interchange - Crop Site Database - Search", Html(""), scripts, Html(""), preamble, afterword) {
+  @base("AgMIP Data Interchange - Crop Site Database - Search", Html(""), scripts, css, preamble, afterword) {
   <div class="disIn col-sm-12">
     <h1 class="searchPageTitle" style="padding-left:0px;"><a class="collapseBtn" data-toggle="collapse" data-target="#searchSection">
 
